@@ -1,0 +1,2 @@
+# MyLilSynthy
+Toy software synthesizer
