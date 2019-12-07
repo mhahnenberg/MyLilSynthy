@@ -155,8 +155,8 @@ void Synth::computeSineWave() {
     bool softStop = this->_softStop;
     SoundOutputBuffer* soundBuffer = &this->_soundOutputData->soundBuffer;
     int toneHz = noteFrequencies[this->_getHighestNote()][this->_currentOctave];
-    int16_t targetToneVolume = softStop ? 300 : 3000;
-    int16_t currToneVolume = softStart ? 300 : 3000;
+    int16_t targetToneVolume = softStop ? 150 : 3000;
+    int16_t currToneVolume = softStart ? 150 : 3000;
     int16_t toneVolumeStep = 0;
     if (softStart) {
         toneVolumeStep = 150;
@@ -319,7 +319,6 @@ void Synth::startPlayingNote(Note note) {
         this->_softStart = true;
     }
     this->_isPlaying = true;
-    printf("enabling playback\n");
 }
 
 void Synth::stopPlayingNote(Note note) {

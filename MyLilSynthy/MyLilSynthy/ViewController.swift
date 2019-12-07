@@ -51,7 +51,7 @@ class ViewController: NSViewController {
     override func resignFirstResponder() -> Bool { return true }
 
     func canHandleKeyDown(with event: NSEvent) -> Bool {
-        return noteForKeyCode(keyCode: event.keyCode) != nil
+        return self.octaveStepForKeyCode(keyCode: event.keyCode) != nil || noteForKeyCode(keyCode: event.keyCode) != nil
     }
     
     func noteForKeyCode(keyCode: UInt16) -> Note? {
@@ -86,7 +86,28 @@ class ViewController: NSViewController {
         }
     }
     
+    func octaveStepForKeyCode(keyCode: UInt16) -> Int? {
+        switch keyCode {
+        case 6:
+            return -1
+        case 7:
+            return 1
+        default:
+            return nil
+        }
+    }
+    
     override func keyDown(with event: NSEvent) {
+        let octaveStep = self.octaveStepForKeyCode(keyCode: event.keyCode)
+        if octaveStep != nil {
+            if octaveStep! > 0 {
+                tryIncrementOctave(self.synth)
+            } else {
+                tryDecrementOctave(self.synth)
+            }
+            return;
+        }
+        
         let note = self.noteForKeyCode(keyCode: event.keyCode)
         if note == nil {
             return;
@@ -101,11 +122,5 @@ class ViewController: NSViewController {
         }
         stopPlayingNote(self.synth, note!)
     }
-//
-//    func getRandomActiveNote() {
-//        let n = Int(arc4random_uniform(UInt32(s.count)))
-//        let i = advance(s.startIndex, n)
-//        return s[i]
-//    }
 }
 
