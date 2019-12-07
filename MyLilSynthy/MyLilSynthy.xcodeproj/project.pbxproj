@@ -15,6 +15,7 @@
 		4D3CEDCD2399F7CF005A3C77 /* FisherPriceSynth3UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D3CEDCC2399F7CF005A3C77 /* FisherPriceSynth3UITests.swift */; };
 		4D3CEDE0239A24CE005A3C77 /* Synth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3CEDDE239A24CE005A3C77 /* Synth.cpp */; };
 		4D3CEDE3239A2F29005A3C77 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D3CEDE2239A2F29005A3C77 /* AudioUnit.framework */; };
+		4D6BF5BB239B76BA0030D28D /* SineOscillator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D6BF5B9239B76BA0030D28D /* SineOscillator.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +53,8 @@
 		4D3CEDDE239A24CE005A3C77 /* Synth.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Synth.cpp; sourceTree = "<group>"; };
 		4D3CEDDF239A24CE005A3C77 /* Synth.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Synth.hpp; sourceTree = "<group>"; };
 		4D3CEDE2239A2F29005A3C77 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		4D6BF5B9239B76BA0030D28D /* SineOscillator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SineOscillator.cpp; sourceTree = "<group>"; };
+		4D6BF5BA239B76BA0030D28D /* SineOscillator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SineOscillator.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +116,8 @@
 				4D3CEDDE239A24CE005A3C77 /* Synth.cpp */,
 				4D3CEDDF239A24CE005A3C77 /* Synth.hpp */,
 				4D3CEDDD239A24CE005A3C77 /* MyLilSynthy-Bridging-Header.h */,
+				4D6BF5B9239B76BA0030D28D /* SineOscillator.cpp */,
+				4D6BF5BA239B76BA0030D28D /* SineOscillator.hpp */,
 			);
 			path = MyLilSynthy;
 			sourceTree = "<group>";
@@ -277,6 +282,7 @@
 				4D3CEDB12399F7CE005A3C77 /* ViewController.swift in Sources */,
 				4D3CEDAF2399F7CE005A3C77 /* AppDelegate.swift in Sources */,
 				4D3CEDE0239A24CE005A3C77 /* Synth.cpp in Sources */,
+				4D6BF5BB239B76BA0030D28D /* SineOscillator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

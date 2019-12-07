@@ -150,45 +150,48 @@ const double noteFrequencies[12][9] = {
     },
 };
 
-void Synth::computeSineWave() {
-    bool softStart = this->_softStart;
-    bool softStop = this->_softStop;
-    SoundOutputBuffer* soundBuffer = &this->_soundOutputData->soundBuffer;
-    int toneHz = noteFrequencies[this->_getHighestNote()][this->_currentOctave];
-    int16_t targetToneVolume = softStop ? 150 : 3000;
-    int16_t currToneVolume = softStart ? 150 : 3000;
-    int16_t toneVolumeStep = 0;
-    if (softStart) {
-        toneVolumeStep = 150;
-    } else if (softStop) {
-        toneVolumeStep = -150;
-    }
-    int wavePeriod = soundBuffer->samplesPerSecond / toneHz;
-    
-    int16_t *sampleOut = soundBuffer->samples;
-    for (int sampleIndex = 0; sampleIndex < soundBuffer->sampleCount; ++sampleIndex) {
-        float sineValue = sinf(soundBuffer->tSine);
-        int16_t sampleValue = (int16_t)(sineValue * currToneVolume);
-        if (currToneVolume != targetToneVolume) {
-            currToneVolume += toneVolumeStep;
-        }
-        
-        *sampleOut++ = sampleValue;
-        *sampleOut++ = sampleValue;
-        
-        soundBuffer->tSine += M_TAU * 1.0f / (float)wavePeriod;
-        if (soundBuffer->tSine > M_TAU) {
-            soundBuffer->tSine -= M_TAU;
-        }
+void Synth::combineOscillators(int sampleCount, int samplesPerSecond, int16_t* outputBuffer) {
+    // Combine the active oscillators using additive synthesis (i.e. add their signals together).
+    float oscillatorBuffer[sampleCount * 2];
+    memset(&oscillatorBuffer, 0, sizeof(float) * sampleCount * 2);
+    size_t numOscillators = this->_activeOscillators.size();
+    for (auto i = 0; i < numOscillators; ++i) {
+        this->_activeOscillators[i]->computeSamples(oscillatorBuffer, sampleCount, samplesPerSecond);
     }
     
-    if (softStop) {
+    // TODO: Normalize the rendered oscillator output.
+    // This logic currently creates clicking in the sample. Need to find a better/more correct way.
+//    for (auto i = 0; i < sampleCount * 2; ++i) {
+//        oscillatorBuffer[i] /= (float)numOscillators;
+//    }
+
+    // Copy the signal over to the output buffer, converting to int16 on the way.
+    int16_t currToneVolume = 3000;
+    int16_t *sampleOut = outputBuffer;
+    for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
+        float rawSampleValue1 = oscillatorBuffer[2 * sampleIndex];
+        float rawSampleValue2 = oscillatorBuffer[2 * sampleIndex + 1];
+        
+        int16_t sampleValue1 = (int16_t)(rawSampleValue1 * currToneVolume);
+        int16_t sampleValue2 = (int16_t)(rawSampleValue2 * currToneVolume);
+        
+        *sampleOut++ = sampleValue1;
+        *sampleOut++ = sampleValue2;
+    }
+
+    // Remove oscillators that are no longer playing.
+    for (auto i = 0; i < this->_activeOscillators.size(); ++i) {
+        if (!this->_activeOscillators[i]->isPlaying()) {
+            std::swap(this->_activeOscillators[i], this->_activeOscillators[this->_activeOscillators.size() - 1]);
+            this->_activeOscillators.pop_back();
+            --i;
+            continue;
+        }
+    }
+
+    if (this->_activeOscillators.empty()) {
         this->_isPlaying = false;
-        this->_activeNotes.clear();
     }
-    this->_softStart = false;
-    this->_softStop = false;
-    
 }
 
 void Synth::zeroFill() {
@@ -215,7 +218,7 @@ OSStatus OSXAudioUnitCallback(void * inRefCon,
     Synth* synth = ((Synth*)inRefCon);
     synth->getSoundOutputData()->soundBuffer.sampleCount = inNumberFrames;
     if (synth->isPlaying()) {
-        synth->computeSineWave();
+        synth->combineOscillators(inNumberFrames, 48000, synth->getSoundOutputData()->soundBuffer.samples);
     } else {
         synth->zeroFill();
     }
@@ -279,8 +282,6 @@ void Synth::initialize() {
     this->_soundOutputData->audioDescriptor.mBytesPerFrame    = sizeof(int16_t); // don't multiply by channel count with non-interleaved!
     this->_soundOutputData->audioDescriptor.mBytesPerPacket   = this->_soundOutputData->audioDescriptor.mFramesPerPacket * this->_soundOutputData->audioDescriptor.mBytesPerFrame;
     
-    
-    
     AudioUnitSetProperty(this->_soundOutputData->audioUnit,
                          kAudioUnitProperty_StreamFormat,
                          kAudioUnitScope_Input,
@@ -303,31 +304,37 @@ void Synth::initialize() {
     printf("Done.\n");
 }
 
-Note Synth::_getHighestNote() {
-    Note maxNote = *this->_activeNotes.begin();
-    for (auto note : this->_activeNotes) {
-        if (note > maxNote) {
-            maxNote = note;
-        }
-    }
-    return maxNote;
+const SineOscillator& Synth::_getHighestOscillator() {
+    return *this->_activeOscillators.back();
+}
+
+std::unique_ptr<SineOscillator> Synth::_buildOscillatorForNote(Note note) {
+    int toneHz = noteFrequencies[note][this->_currentOctave];
+    return std::make_unique<SineOscillator>(toneHz, 3000);
 }
 
 void Synth::startPlayingNote(Note note) {
-    this->_activeNotes.insert(note);
-    if (!this->_isPlaying) {
-        this->_softStart = true;
+    std::unique_ptr<SineOscillator> oscillator = this->_buildOscillatorForNote(note);
+    for (auto iter = this->_activeOscillators.begin(); iter != this->_activeOscillators.end(); ++iter) {
+        if ((*iter)->frequency() == oscillator->frequency()) {
+            return;
+        }
     }
+    
+    this->_activeOscillators.push_back(std::move(oscillator));
+    this->_activeOscillators.back()->start();
+    printf("Starting note %d\n", note);
     this->_isPlaying = true;
 }
 
 void Synth::stopPlayingNote(Note note) {
-    if (this->_activeNotes.size() == 1) {
-        printf("activeNotes will be empty, disabling playback\n");
-        this->_softStop = true;
-    } else {
-        printf("Stopping note %d\n", note);
-        this->_activeNotes.erase(note);
+    printf("Stopping note %d\n", note);
+    int toneHz = noteFrequencies[note][this->_currentOctave];
+    for (auto iter = this->_activeOscillators.begin(); iter != this->_activeOscillators.end(); ++iter) {
+        if ((*iter)->frequency() == toneHz) {
+            (*iter)->stop();
+            break;
+        }
     }
 }
 

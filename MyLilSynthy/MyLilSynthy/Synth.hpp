@@ -11,9 +11,11 @@
 
 #include <stdio.h>
 #include <limits>
+#include <vector>
 #include <set>
 #include <unistd.h>
 #include <AudioUnit/AudioUnit.h>
+#include "SineOscillator.hpp"
 
 typedef enum {
     C = 0,
@@ -51,8 +53,6 @@ class Synth {
 public:
     Synth(int maxOctave)
         : _isPlaying(false)
-        , _softStart(false)
-        , _softStop(false)
         , _currentOctave(4)
         , _maxOctave(maxOctave)
         , _soundOutputData(nullptr)
@@ -68,17 +68,17 @@ public:
     bool isPlaying() const { return _isPlaying; }
     
     void computeSineWave();
+    void combineOscillators(int sampleCount, int samplesPerSecond, int16_t* outputBuffer);
     void zeroFill();
 
 private:
-    Note _getHighestNote();
+    const SineOscillator& _getHighestOscillator();
+    std::unique_ptr<SineOscillator> _buildOscillatorForNote(Note);
     
     bool _isPlaying;
-    bool _softStart;
-    bool _softStop;
     int _currentOctave;
     int _maxOctave;
-    std::set<Note> _activeNotes;
+    std::vector<std::unique_ptr<SineOscillator>> _activeOscillators;
     SoundOutputData* _soundOutputData;
 };
 
