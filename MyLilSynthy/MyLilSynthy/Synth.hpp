@@ -51,6 +51,8 @@ class Synth {
 public:
     Synth(int maxOctave)
         : _isPlaying(false)
+        , _softStart(false)
+        , _softStop(false)
         , _currentOctave(4)
         , _maxOctave(maxOctave)
         , _soundOutputData(nullptr)
@@ -72,6 +74,8 @@ private:
     Note _getHighestNote();
     
     bool _isPlaying;
+    bool _softStart;
+    bool _softStop;
     int _currentOctave;
     int _maxOctave;
     std::set<Note> _activeNotes;

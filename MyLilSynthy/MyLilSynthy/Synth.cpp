@@ -151,15 +151,27 @@ const double noteFrequencies[12][9] = {
 };
 
 void Synth::computeSineWave() {
+    bool softStart = this->_softStart;
+    bool softStop = this->_softStop;
     SoundOutputBuffer* soundBuffer = &this->_soundOutputData->soundBuffer;
     int toneHz = noteFrequencies[this->_getHighestNote()][this->_currentOctave];
-    int16_t toneVolume = 3000;
+    int16_t targetToneVolume = softStop ? 300 : 3000;
+    int16_t currToneVolume = softStart ? 300 : 3000;
+    int16_t toneVolumeStep = 0;
+    if (softStart) {
+        toneVolumeStep = 150;
+    } else if (softStop) {
+        toneVolumeStep = -150;
+    }
     int wavePeriod = soundBuffer->samplesPerSecond / toneHz;
     
     int16_t *sampleOut = soundBuffer->samples;
-    for(int SampleIndex = 0; SampleIndex < soundBuffer->sampleCount; ++SampleIndex) {
+    for (int sampleIndex = 0; sampleIndex < soundBuffer->sampleCount; ++sampleIndex) {
         float sineValue = sinf(soundBuffer->tSine);
-        int16_t sampleValue = (int16_t)(sineValue * toneVolume);
+        int16_t sampleValue = (int16_t)(sineValue * currToneVolume);
+        if (currToneVolume != targetToneVolume) {
+            currToneVolume += toneVolumeStep;
+        }
         
         *sampleOut++ = sampleValue;
         *sampleOut++ = sampleValue;
@@ -169,6 +181,14 @@ void Synth::computeSineWave() {
             soundBuffer->tSine -= M_TAU;
         }
     }
+    
+    if (softStop) {
+        this->_isPlaying = false;
+        this->_activeNotes.clear();
+    }
+    this->_softStart = false;
+    this->_softStop = false;
+    
 }
 
 void Synth::zeroFill() {
@@ -179,6 +199,7 @@ void Synth::zeroFill() {
         *sampleOut++ = sampleValue;
         *sampleOut++ = sampleValue;
     }
+    soundBuffer->tSine = 0.0;
 }
 
 OSStatus OSXAudioUnitCallback(void * inRefCon,
@@ -294,6 +315,9 @@ Note Synth::_getHighestNote() {
 
 void Synth::startPlayingNote(Note note) {
     this->_activeNotes.insert(note);
+    if (!this->_isPlaying) {
+        this->_softStart = true;
+    }
     this->_isPlaying = true;
     printf("enabling playback\n");
 }
@@ -301,9 +325,11 @@ void Synth::startPlayingNote(Note note) {
 void Synth::stopPlayingNote(Note note) {
     if (this->_activeNotes.size() == 1) {
         printf("activeNotes will be empty, disabling playback\n");
-        this->_isPlaying = false;
+        this->_softStop = true;
+    } else {
+        printf("Stopping note %d\n", note);
+        this->_activeNotes.erase(note);
     }
-    this->_activeNotes.erase(note);
 }
 
 void Synth::tryIncrementOctave() {
