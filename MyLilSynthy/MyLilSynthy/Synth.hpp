@@ -15,7 +15,7 @@
 #include <set>
 #include <unistd.h>
 #include <AudioUnit/AudioUnit.h>
-#include "SineOscillator.hpp"
+#include "AbstractOscillator.hpp"
 
 typedef enum {
     C = 0,
@@ -72,13 +72,12 @@ public:
     void zeroFill();
 
 private:
-    const SineOscillator& _getHighestOscillator();
-    std::unique_ptr<SineOscillator> _buildOscillatorForNote(Note);
+    std::unique_ptr<AbstractOscillator> _buildOscillatorForNote(Note);
     
     bool _isPlaying;
     int _currentOctave;
     int _maxOctave;
-    std::vector<std::unique_ptr<SineOscillator>> _activeOscillators;
+    std::vector<std::unique_ptr<AbstractOscillator>> _activeOscillators;
     SoundOutputData* _soundOutputData;
 };
 

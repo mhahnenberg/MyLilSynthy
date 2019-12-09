@@ -11,6 +11,8 @@
 #include <limits>
 #include <sys/mman.h>
 #include <CoreAudio/CoreAudio.h>
+#include "SawtoothOscillator.hpp"
+#include "SineOscillator.hpp"
 #include "MyLilSynthy-Bridging-Header.h"
 
 #define M_TAU (2 * M_PI)
@@ -304,17 +306,13 @@ void Synth::initialize() {
     printf("Done.\n");
 }
 
-const SineOscillator& Synth::_getHighestOscillator() {
-    return *this->_activeOscillators.back();
-}
-
-std::unique_ptr<SineOscillator> Synth::_buildOscillatorForNote(Note note) {
+std::unique_ptr<AbstractOscillator> Synth::_buildOscillatorForNote(Note note) {
     int toneHz = noteFrequencies[note][this->_currentOctave];
-    return std::make_unique<SineOscillator>(toneHz, 3000);
+    return std::make_unique<SawtoothOscillator>(toneHz);
 }
 
 void Synth::startPlayingNote(Note note) {
-    std::unique_ptr<SineOscillator> oscillator = this->_buildOscillatorForNote(note);
+    std::unique_ptr<AbstractOscillator> oscillator = this->_buildOscillatorForNote(note);
     for (auto iter = this->_activeOscillators.begin(); iter != this->_activeOscillators.end(); ++iter) {
         if ((*iter)->frequency() == oscillator->frequency()) {
             return;
@@ -353,6 +351,7 @@ void Synth::tryDecrementOctave() {
 }
 
 extern "C" {
+
 const void *createSynth(int maxOctave) {
     Synth* synth = new Synth(maxOctave);
     return (void *)synth;
@@ -382,4 +381,5 @@ void stopPlayingNote(const void* object, Note note) {
     Synth* synth = (Synth *)object;
     synth->stopPlayingNote(note);
 }
+
 }

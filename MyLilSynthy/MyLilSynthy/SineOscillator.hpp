@@ -10,30 +10,22 @@
 #define Oscillator_hpp
 
 #include <unistd.h>
+#include "AbstractOscillator.hpp"
 
-class SineOscillator {
+class SineOscillator : public AbstractOscillator {
 public:
-    SineOscillator(int frequency, int volume)
-        : _frequency(frequency)
-        , _nextSineX(0.0)
-        , _isPlaying(false)
-        , _softStart(false)
-        , _softStop(false)
-    {
-    }
+    SineOscillator(int frequency);
     
-    int frequency() const { return this->_frequency; }
-    void computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond);
-    void start();
-    void stop();
-    bool isPlaying() const { return this->_isPlaying; }
+    virtual void computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond) override;
 
 private:
-    int _frequency;
     float _nextSineX;
-    bool _isPlaying;
-    bool _softStart;
-    bool _softStop;
 };
+
+inline SineOscillator::SineOscillator(int frequency)
+    : AbstractOscillator(frequency)
+    , _nextSineX(0.0)
+{
+}
 
 #endif /* Oscillator_hpp */

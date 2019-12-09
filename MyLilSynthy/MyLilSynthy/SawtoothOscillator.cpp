@@ -1,18 +1,18 @@
 //
-//  Oscillator.cpp
+//  SawtoothOscillator.cpp
 //  MyLilSynthy
 //
-//  Created by Mark Hahnenberg on 12/6/19.
+//  Created by Mark Hahnenberg on 12/9/19.
 //  Copyright © 2019 Mark Hahnenberg. All rights reserved.
 //
 
-#include "SineOscillator.hpp"
+#include "SawtoothOscillator.hpp"
 #include <limits>
 #include <math.h>
 
 #define M_TAU (2 * M_PI)
 
-void SineOscillator::computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond) {
+void SawtoothOscillator::computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond) {
     int frequency = this->frequency();
     int wavePeriod = samplesPerSecond / frequency;
     
