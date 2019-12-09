@@ -11,17 +11,19 @@
 
 class AbstractOscillator {
 public:
-    AbstractOscillator(int frequency);
+    AbstractOscillator(int frequency, float gain);
     virtual ~AbstractOscillator();
     
     int frequency() const;
+    float gain() const;
+    bool isPlaying() const;
     virtual void computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond) = 0;
     void start();
     void stop();
-    bool isPlaying() const;
     
 protected:
     int _frequency;
+    float _gain;
     bool _isPlaying;
     bool _softStart;
     bool _softStop;
@@ -29,6 +31,10 @@ protected:
 
 inline int AbstractOscillator::frequency() const {
     return this->_frequency;
+}
+
+inline float AbstractOscillator::gain() const {
+    return this->_gain;
 }
 
 inline bool AbstractOscillator::isPlaying() const {

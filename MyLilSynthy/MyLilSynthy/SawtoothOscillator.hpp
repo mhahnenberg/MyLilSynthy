@@ -10,20 +10,21 @@
 #define SawtoothOscillator_hpp
 
 #include <stdio.h>
+#include <vector>
 #include "AbstractOscillator.hpp"
+#include "SineOscillator.hpp"
 
 class SawtoothOscillator : public AbstractOscillator {
 public:
-    SawtoothOscillator(int frequency)
-        : AbstractOscillator(frequency)
-        , _nextSineX(0.0)
-    {
-    }
+    SawtoothOscillator(int frequency, float gain);
+    virtual ~SawtoothOscillator() override;
     
     virtual void computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond) override;
     
 private:
-    float _nextSineX;
+    std::vector<std::unique_ptr<SineOscillator>> _oscillators;
+    
+    const static int s_numSineOscillators = 200;
 };
 
 #endif /* SawtoothOscillator_hpp */

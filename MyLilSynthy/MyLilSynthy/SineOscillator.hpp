@@ -14,18 +14,12 @@
 
 class SineOscillator : public AbstractOscillator {
 public:
-    SineOscillator(int frequency);
+    SineOscillator(int frequency, float gain);
     
     virtual void computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond) override;
 
 private:
     float _nextSineX;
 };
-
-inline SineOscillator::SineOscillator(int frequency)
-    : AbstractOscillator(frequency)
-    , _nextSineX(0.0)
-{
-}
 
 #endif /* Oscillator_hpp */

@@ -12,12 +12,19 @@
 
 #define M_TAU (2 * M_PI)
 
+SineOscillator::SineOscillator(int frequency, float gain)
+    : AbstractOscillator(frequency, gain)
+    , _nextSineX(0.0)
+{
+}
+
 void SineOscillator::computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond) {
     int frequency = this->frequency();
     int wavePeriod = samplesPerSecond / frequency;
     
     bool softStart = this->_softStart;
     bool softStop = this->_softStop;
+    float gain = this->gain();
     
     float targetSignalDamping = softStop ? 0.0 : 1.0;
     float currSignalDamping = softStart ? 0.0 : 1.0;
@@ -30,7 +37,7 @@ void SineOscillator::computeSamples(float* sampleBuffer, int sampleCount, int sa
     
     float *sampleOut = sampleBuffer;
     for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
-        float sineValue = sinf(this->_nextSineX) * currSignalDamping;
+        float sineValue = sinf(this->_nextSineX) * currSignalDamping * gain;
 
         float remainingSignalDamping = targetSignalDamping - currSignalDamping;
         if (remainingSignalDamping <= -0.025 || remainingSignalDamping >= 0.025) {

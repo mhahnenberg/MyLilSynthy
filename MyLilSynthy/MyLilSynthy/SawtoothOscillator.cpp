@@ -10,14 +10,32 @@
 #include <limits>
 #include <math.h>
 
-#define M_TAU (2 * M_PI)
+SawtoothOscillator::SawtoothOscillator(int frequency, float gain)
+    : AbstractOscillator(frequency, gain)
+{
+    int samplesPerSecond = 48000;
+    int numOscillators = (samplesPerSecond / 2) / frequency;
+    for (int i = 1; i <= numOscillators; ++i) {
+        float gain = 1.0 / (float)i;
+        this->_oscillators.push_back(std::make_unique<SineOscillator>(frequency * i, gain));
+    }
+}
+
+SawtoothOscillator::~SawtoothOscillator()
+{
+}
 
 void SawtoothOscillator::computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond) {
-    int frequency = this->frequency();
-    int wavePeriod = samplesPerSecond / frequency;
+    float privateSampleBuffer[sampleCount * 2];
+    memset(privateSampleBuffer, 0, sizeof(float) * sampleCount * 2);
+    // First compute the raw values for each of the component sine oscillators.
+    for (auto& oscillator : this->_oscillators) {
+        oscillator->computeSamples(privateSampleBuffer, sampleCount, samplesPerSecond);
+    }
     
     bool softStart = this->_softStart;
     bool softStop = this->_softStop;
+    float gain = this->gain();
     
     float targetSignalDamping = softStop ? 0.0 : 1.0;
     float currSignalDamping = softStart ? 0.0 : 1.0;
@@ -30,20 +48,15 @@ void SawtoothOscillator::computeSamples(float* sampleBuffer, int sampleCount, in
     
     float *sampleOut = sampleBuffer;
     for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
-        float sineValue = sinf(this->_nextSineX) * currSignalDamping;
+        float sampleValue = privateSampleBuffer[sampleIndex * 2] * currSignalDamping * gain;
 
         float remainingSignalDamping = targetSignalDamping - currSignalDamping;
         if (remainingSignalDamping <= -0.025 || remainingSignalDamping >= 0.025) {
             currSignalDamping += signalDampingStep;
         }
         
-        *sampleOut++ += sineValue;
-        *sampleOut++ += sineValue;
-        
-        this->_nextSineX += M_TAU * 1.0f / (float)wavePeriod;
-        if (this->_nextSineX > M_TAU) {
-            this->_nextSineX -= M_TAU;
-        }
+        *sampleOut++ += sampleValue;
+        *sampleOut++ += sampleValue;
     }
     
     if (softStop) {

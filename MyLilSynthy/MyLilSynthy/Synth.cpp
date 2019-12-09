@@ -308,7 +308,7 @@ void Synth::initialize() {
 
 std::unique_ptr<AbstractOscillator> Synth::_buildOscillatorForNote(Note note) {
     int toneHz = noteFrequencies[note][this->_currentOctave];
-    return std::make_unique<SawtoothOscillator>(toneHz);
+    return std::make_unique<SawtoothOscillator>(toneHz, 1.0);
 }
 
 void Synth::startPlayingNote(Note note) {
