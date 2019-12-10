@@ -306,13 +306,13 @@ void Synth::initialize() {
     printf("Done.\n");
 }
 
-std::unique_ptr<AbstractOscillator> Synth::_buildOscillatorForNote(Note note) {
+std::unique_ptr<Oscillator> Synth::_buildOscillatorForNote(Note note) {
     int toneHz = noteFrequencies[note][this->_currentOctave];
-    return std::make_unique<SawtoothOscillator>(toneHz, 1.0);
+    return std::make_unique<Oscillator>(Oscillator::Triangle, toneHz, 1.0);
 }
 
 void Synth::startPlayingNote(Note note) {
-    std::unique_ptr<AbstractOscillator> oscillator = this->_buildOscillatorForNote(note);
+    std::unique_ptr<Oscillator> oscillator = this->_buildOscillatorForNote(note);
     for (auto iter = this->_activeOscillators.begin(); iter != this->_activeOscillators.end(); ++iter) {
         if ((*iter)->frequency() == oscillator->frequency()) {
             return;

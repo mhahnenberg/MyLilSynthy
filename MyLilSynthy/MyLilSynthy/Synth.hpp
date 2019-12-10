@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <AudioUnit/AudioUnit.h>
 #include "AbstractOscillator.hpp"
+#include "Oscillator.hpp"
 
 typedef enum {
     C = 0,
@@ -72,12 +73,12 @@ public:
     void zeroFill();
 
 private:
-    std::unique_ptr<AbstractOscillator> _buildOscillatorForNote(Note);
+    std::unique_ptr<Oscillator> _buildOscillatorForNote(Note);
     
     bool _isPlaying;
     int _currentOctave;
     int _maxOctave;
-    std::vector<std::unique_ptr<AbstractOscillator>> _activeOscillators;
+    std::vector<std::unique_ptr<Oscillator>> _activeOscillators;
     SoundOutputData* _soundOutputData;
 };
 
