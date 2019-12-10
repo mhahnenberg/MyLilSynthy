@@ -16,6 +16,7 @@
 		4D3CEDE0239A24CE005A3C77 /* Synth.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3CEDDE239A24CE005A3C77 /* Synth.cpp */; };
 		4D3CEDE3239A2F29005A3C77 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D3CEDE2239A2F29005A3C77 /* AudioUnit.framework */; };
 		4DA32629239F5D7000301E4D /* Oscillator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA32627239F5D7000301E4D /* Oscillator.cpp */; };
+		4DA3262C239F7F5000301E4D /* Envelope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA3262A239F7F5000301E4D /* Envelope.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,9 @@
 		4D3CEDE2239A2F29005A3C77 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		4DA32627239F5D7000301E4D /* Oscillator.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Oscillator.cpp; sourceTree = "<group>"; };
 		4DA32628239F5D7000301E4D /* Oscillator.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Oscillator.hpp; sourceTree = "<group>"; };
+		4DA3262A239F7F5000301E4D /* Envelope.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Envelope.cpp; sourceTree = "<group>"; };
+		4DA3262B239F7F5000301E4D /* Envelope.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Envelope.hpp; sourceTree = "<group>"; };
+		4DA3262D239F83F500301E4D /* Constants.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Constants.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +122,9 @@
 				4D3CEDDD239A24CE005A3C77 /* MyLilSynthy-Bridging-Header.h */,
 				4DA32627239F5D7000301E4D /* Oscillator.cpp */,
 				4DA32628239F5D7000301E4D /* Oscillator.hpp */,
+				4DA3262A239F7F5000301E4D /* Envelope.cpp */,
+				4DA3262B239F7F5000301E4D /* Envelope.hpp */,
+				4DA3262D239F83F500301E4D /* Constants.hpp */,
 			);
 			path = MyLilSynthy;
 			sourceTree = "<group>";
@@ -282,6 +289,7 @@
 				4D3CEDB12399F7CE005A3C77 /* ViewController.swift in Sources */,
 				4D3CEDAF2399F7CE005A3C77 /* AppDelegate.swift in Sources */,
 				4D3CEDE0239A24CE005A3C77 /* Synth.cpp in Sources */,
+				4DA3262C239F7F5000301E4D /* Envelope.cpp in Sources */,
 				4DA32629239F5D7000301E4D /* Oscillator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -10,6 +10,7 @@
 #define Oscillator_hpp
 
 #include <stdio.h>
+#include "Envelope.hpp"
 
 class Oscillator {
 public:
@@ -26,6 +27,7 @@ public:
     float gain() const;
     OscillatorType type() const;
     bool isPlaying() const;
+    const Envelope& envelope() const;
     void computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond);
     void start();
     void stop();
@@ -36,10 +38,8 @@ private:
     OscillatorType _type;
     int _frequency;
     float _gain;
-    bool _isPlaying;
-    bool _softStart;
-    bool _softStop;
     
+    Envelope _envelope;
     float _nextX;
 };
 
@@ -56,16 +56,19 @@ inline float Oscillator::gain() const {
 }
 
 inline bool Oscillator::isPlaying() const {
-    return this->_isPlaying;
+    return this->_envelope.state() != Envelope::Off;
+}
+
+inline const Envelope& Oscillator::envelope() const {
+    return this->_envelope;
 }
 
 inline void Oscillator::start() {
-    this->_softStart = true;
-    this->_isPlaying = true;
+    this->_envelope.enterState(Envelope::Attack);
 }
 
 inline void Oscillator::stop() {
-    this->_softStop = true;
+    this->_envelope.enterState(Envelope::Release);
 }
 
 #endif /* Oscillator_hpp */

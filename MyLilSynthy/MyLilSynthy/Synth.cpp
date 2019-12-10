@@ -312,7 +312,7 @@ std::unique_ptr<Oscillator> Synth::_buildOscillatorForNote(Note note) {
 void Synth::startPlayingNote(Note note) {
     std::unique_ptr<Oscillator> oscillator = this->_buildOscillatorForNote(note);
     for (auto iter = this->_activeOscillators.begin(); iter != this->_activeOscillators.end(); ++iter) {
-        if ((*iter)->frequency() == oscillator->frequency()) {
+        if ((*iter)->frequency() == oscillator->frequency() && (*iter)->envelope().state() != Envelope::Release) {
             return;
         }
     }
@@ -327,7 +327,7 @@ void Synth::stopPlayingNote(Note note) {
     printf("Stopping note %d\n", note);
     int toneHz = noteFrequencies[note][this->_currentOctave];
     for (auto iter = this->_activeOscillators.begin(); iter != this->_activeOscillators.end(); ++iter) {
-        if ((*iter)->frequency() == toneHz) {
+        if ((*iter)->frequency() == toneHz && (*iter)->envelope().state() != Envelope::Release) {
             (*iter)->stop();
             break;
         }

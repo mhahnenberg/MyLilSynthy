@@ -15,9 +15,7 @@ Oscillator::Oscillator(OscillatorType type, int frequency, float gain)
     : _type(type)
     , _frequency(frequency)
     , _gain(gain)
-    , _isPlaying(false)
-    , _softStart(false)
-    , _softStop(false)
+    , _envelope(0.0001, 0.01, 0.5, 0.1, 1.0)
     , _nextX(0.0)
 {
 }
@@ -39,28 +37,12 @@ float Oscillator::computeSampleValue(float x) {
 void Oscillator::computeSamples(float* sampleBuffer, int sampleCount, int samplesPerSecond) {
     int wavePeriod = samplesPerSecond / this->frequency();
     float gain = this->gain();
-
-    bool softStart = this->_softStart;
-    bool softStop = this->_softStop;
-    float targetSignalDamping = softStop ? 0.0 : 1.0;
-    float currSignalDamping = softStart ? 0.0 : 1.0;
-    float signalDampingStep = 0;
-    if (softStart) {
-        signalDampingStep = 0.025;
-    } else if (softStop) {
-        signalDampingStep = -0.025;
-    }
     
     float *sampleOut = sampleBuffer;
     for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
         float sampleValue = this->computeSampleValue(this->_nextX);
-        sampleValue *= currSignalDamping;
+        sampleValue *= this->_envelope.computeNextSampleFactor();
         sampleValue *= gain;
-
-        float remainingSignalDamping = targetSignalDamping - currSignalDamping;
-        if (remainingSignalDamping <= -0.025 || remainingSignalDamping >= 0.025) {
-            currSignalDamping += signalDampingStep;
-        }
         
         *sampleOut++ += sampleValue;
         *sampleOut++ += sampleValue;
@@ -70,10 +52,4 @@ void Oscillator::computeSamples(float* sampleBuffer, int sampleCount, int sample
             this->_nextX -= M_TAU;
         }
     }
-    
-    if (softStop) {
-        this->_isPlaying = false;
-    }
-    this->_softStart = false;
-    this->_softStop = false;
 }
