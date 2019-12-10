@@ -15,7 +15,6 @@
 #include <set>
 #include <unistd.h>
 #include <AudioUnit/AudioUnit.h>
-#include "AbstractOscillator.hpp"
 #include "Oscillator.hpp"
 
 typedef enum {

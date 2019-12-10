@@ -11,8 +11,6 @@
 #include <limits>
 #include <sys/mman.h>
 #include <CoreAudio/CoreAudio.h>
-#include "SawtoothOscillator.hpp"
-#include "SineOscillator.hpp"
 #include "MyLilSynthy-Bridging-Header.h"
 
 #define M_TAU (2 * M_PI)
@@ -308,7 +306,7 @@ void Synth::initialize() {
 
 std::unique_ptr<Oscillator> Synth::_buildOscillatorForNote(Note note) {
     int toneHz = noteFrequencies[note][this->_currentOctave];
-    return std::make_unique<Oscillator>(Oscillator::Triangle, toneHz, 1.0);
+    return std::make_unique<Oscillator>(Oscillator::Sine, toneHz, 1.0);
 }
 
 void Synth::startPlayingNote(Note note) {
