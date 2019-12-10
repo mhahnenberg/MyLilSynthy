@@ -90,5 +90,6 @@ float Envelope::computeNextSampleFactor()
 
 float Envelope::computeGainModifierFactor(float startLevel, float endLevel, u_int64_t lengthInSamples) const
 {
+    // Algorithm shamelessly borrowed from http://www.martin-finke.de/blog/articles/audio-plugins-011-envelopes/
     return 1.0 + (log(endLevel) - log(startLevel)) / (lengthInSamples);
 }
