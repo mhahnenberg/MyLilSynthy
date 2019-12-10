@@ -306,7 +306,7 @@ void Synth::initialize() {
 
 std::unique_ptr<Oscillator> Synth::_buildOscillatorForNote(Note note) {
     int toneHz = noteFrequencies[note][this->_currentOctave];
-    return std::make_unique<Oscillator>(Oscillator::Sine, toneHz, 1.0);
+    return std::make_unique<Oscillator>(Oscillator::Square, toneHz, 1.0);
 }
 
 void Synth::startPlayingNote(Note note) {

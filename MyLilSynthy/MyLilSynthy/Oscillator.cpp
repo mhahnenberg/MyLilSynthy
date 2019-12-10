@@ -16,6 +16,7 @@ Oscillator::Oscillator(OscillatorType type, int frequency, float gain)
     , _frequency(frequency)
     , _gain(gain)
     , _envelope(0.0001, 0.01, 0.5, 0.1, 1.0)
+    , _filter()
     , _nextX(0.0)
 {
 }
@@ -43,6 +44,7 @@ void Oscillator::computeSamples(float* sampleBuffer, int sampleCount, int sample
         float sampleValue = this->computeSampleValue(this->_nextX);
         sampleValue *= this->_envelope.computeNextSampleFactor();
         sampleValue *= gain;
+        sampleValue = this->_filter.processSample(sampleValue);
         
         *sampleOut++ += sampleValue;
         *sampleOut++ += sampleValue;

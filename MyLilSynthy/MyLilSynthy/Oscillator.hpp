@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "Envelope.hpp"
+#include "Filter.hpp"
 
 class Oscillator {
 public:
@@ -40,6 +41,7 @@ private:
     float _gain;
     
     Envelope _envelope;
+    Filter _filter;
     float _nextX;
 };
 
